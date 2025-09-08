@@ -83,10 +83,15 @@ export const updateProfile = async (req,res) => {
     if(password){
       user.password= await bcrypt.hash(password,10);
     }
-    await user.save()
-    res.status(201).json({message:"user updated!",user:{
-      
-    }})
+    const updatedUser= await user.save()
+    res.status(201).json({
+      _id:updatedUser._id,
+      name:updatedUser.name,
+      email:updatedUser.email,
+      image:updatedUser.image,
+      role:updatedUser.role,
+      token:generateToken(updatedUser._id)
+    })
   } catch (error) {
     res.status(500).json({ message: "server error", error: error.message });
     console.log(error.message);
