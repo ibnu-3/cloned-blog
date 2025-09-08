@@ -56,3 +56,39 @@ export const loginUser = async (req, res) => {
     console.log(error.message);
   }
 };
+
+//user info
+export const myProfile = async (req,res) => {
+  try {
+    const user = await User.findById(req.user._id).select('-password')
+    if(!user){
+      res.status(400).json({message:"user not found"})
+    }
+    res.status(201).json(user)
+  } catch (error) {
+    res.status(500).json({ message: "server error", error: error.message });
+    console.log(error.message);
+  }
+}
+//user info
+export const updateProfile = async (req,res) => {
+  const {name, email, password}=req.body;
+  try {
+    const user = await User.findById(req.user._id).select('-password')
+    if(!user){
+      res.status(400).json({message:"user not found"})
+    }
+    user.name= name || user.name;
+    user.email= email || user.email;
+    if(password){
+      user.password= await bcrypt.hash(password,10);
+    }
+    await user.save()
+    res.status(201).json({message:"user updated!",user:{
+      
+    }})
+  } catch (error) {
+    res.status(500).json({ message: "server error", error: error.message });
+    console.log(error.message);
+  }
+}
